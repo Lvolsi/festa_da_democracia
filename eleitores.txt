@@ -1,0 +1,10 @@
+Lista de eleitores aptos
+*-------------------------------------*
+Nome do eleitor: Larissa
+Número do título do eleitor: 123456
+*-------------------------------------*
+Lista de eleitores aptos
+*-------------------------------------*
+Nome do eleitor: Larissa
+Número do título do eleitor: 456789
+*-------------------------------------*
