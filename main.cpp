@@ -1,142 +1,248 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include "lista_dinamica.h"
+#include <cstdlib> // para atoi
 
 using namespace std;
 
-void SaveListaToFile(Lista* lista, const char* filename);
-void LoadListaFromFile(Lista* lista, const char* filename);
-void Search_Lista(Lista* L, int x);
+struct Candidato {
+    string nome;
+    int numero;
+    int votos;
+    Candidato* prox;
+};
 
+struct Eleitor {
+    string nome;
+    int titulo;
+    Eleitor* prox;
+};
 
-void SaveListaToFile(Lista* lista, const char* filename){
-	ofstream arquivo(filename, ios::out | ios::app);
-   
+Candidato* candidatos = NULL;
+Eleitor* eleitores = NULL;
 
-    if (arquivo.is_open()) {
-        no* atual = lista->inicio;
+void inserirCandidato(string nome, int numero) {
+    Candidato* novoCandidato = new Candidato;
+    novoCandidato->nome = nome;
+    novoCandidato->numero = numero;
+    novoCandidato->votos = 0;
+    novoCandidato->prox = NULL;
 
-        while (atual != NULL) {
-            Candidatos* cand = atual->info;
-            arquivo << "Nome do candidato: " << cand->nome << endl;
-            arquivo << "Número do candidato: " << cand->num_candidato << endl;
-            //arquivo << "*-------------------------------------*" << endl;
-
+    if (candidatos == NULL) {
+        candidatos = novoCandidato;
+    } else {
+        Candidato* atual = candidatos;
+        while (atual->prox != NULL) {
             atual = atual->prox;
         }
+        atual->prox = novoCandidato;
+    }
 
-        arquivo.close();
-        cout << "Informações gravadas com sucesso!" << endl;
-    }
-    else {
-        cout << "Não foi possível abrir o arquivo." << endl;
-    }
+    cout << "Candidato cadastrado com sucesso!" << endl;
 }
 
-void LoadListaFromFile(Lista* lista, const char* filename) {
-    ifstream arquivo(filename);
+void inserirEleitor(string nome, int titulo) {
+    Eleitor* novoEleitor = new Eleitor;
+    novoEleitor->nome = nome;
+    novoEleitor->titulo = titulo;
+    novoEleitor->prox = NULL;
 
-    if (arquivo.is_open()) {
-        string line;
-
-        while (getline(arquivo, line)) {
-            if (line.find("Nome do candidato: ") == 0) {
-                Candidatos* cand = new Candidatos;
-
-                // Extrair o nome do candidato removendo o prefixo da linha
-                string nome = line.substr(19);
-                strcpy(cand->nome, nome.c_str());
-
-                // Ler a próxima linha contendo o número do candidato
-                getline(arquivo, line);
-                if (line.find("Número do candidato: ") == 0) {
-                    // Extrair o número do candidato removendo o prefixo da linha
-                    string num_str = line.substr(21);
-                    cand->num_candidato = atoi(num_str.c_str());
-
-                    Insert_Lista(lista, cand);
-                } else {
-                    // A linha esperada não foi encontrada, descartar o candidato
-                    delete cand;
-                }
-            }
-        }
-
-        arquivo.close();
-        cout << "Informações carregadas com sucesso!" << endl;
+    if (eleitores == NULL) {
+        eleitores = novoEleitor;
     } else {
-        cout << "Não foi possível abrir o arquivo." << endl;
+        Eleitor* atual = eleitores;
+        while (atual->prox != NULL) {
+            atual = atual->prox;
+        }
+        atual->prox = novoEleitor;
+    }
+
+    cout << "Eleitor cadastrado com sucesso!" << endl;
+}
+
+void liberarCandidatos() {
+    Candidato* atual = candidatos;
+    while (atual != NULL) {
+        Candidato* prox = atual->prox;
+        delete atual;
+        atual = prox;
+    }
+    candidatos = NULL;
+}
+
+void liberarEleitores() {
+    Eleitor* atual = eleitores;
+    while (atual != NULL) {
+        Eleitor* prox = atual->prox;
+        delete atual;
+        atual = prox;
+    }
+    eleitores = NULL;
+}
+
+void listarCandidatos() {
+    Candidato* atual = candidatos;
+    if (atual == NULL) {
+        cout << "Nenhum candidato cadastrado." << endl;
+    } else {
+        cout << "Lista de candidatos:" << endl;
+        while (atual != NULL) {
+            cout << "Nome: " << atual->nome << ", Numero: " << atual->numero << ", Votos: " << atual->votos << endl;
+            atual = atual->prox;
+        }
     }
 }
 
+void listarEleitores() {
+    Eleitor* atual = eleitores;
+    if (atual == NULL) {
+        cout << "Nenhum eleitor cadastrado." << endl;
+    } else {
+        cout << "Lista de eleitores:" << endl;
+        while (atual != NULL) {
+            cout << "Nome: " << atual->nome << ", Titulo: " << atual->titulo << endl;
+            atual = atual->prox;
+        }
+    }
+}
 
+void salvarCandidatos() {
+    ofstream arquivo("candidatos.txt");
+    if (arquivo.is_open()) {
+        Candidato* atual = candidatos;
+        while (atual != NULL) {
+            arquivo << atual->nome << " " << atual->numero << " " << atual->votos << endl;
+            atual = atual->prox;
+        }
+        arquivo.close();
+        cout << "Dados dos candidatos salvos com sucesso." << endl;
+    } else {
+        cout << "Nao foi possivel abrir o arquivo de candidatos." << endl;
+    }
+}
 
+void salvarEleitores() {
+    ofstream arquivo("eleitores.txt");
+    if (arquivo.is_open()) {
+        Eleitor* atual = eleitores;
+        while (atual != NULL) {
+            arquivo << atual->nome << " " << atual->titulo << endl;
+            atual = atual->prox;
+        }
+        arquivo.close();
+        cout << "Dados dos eleitores salvos com sucesso." << endl;
+    } else {
+        cout << "Nao foi possivel abrir o arquivo de eleitores." << endl;
+    }
+}
+
+void carregarCandidatos() {
+    ifstream arquivo("candidatos.txt");
+    if (arquivo.is_open()) {
+        liberarCandidatos();
+        string linha;
+        while (getline(arquivo, linha)) {
+            string nome;
+            int numero;
+            int votos;
+            sscanf(linha.c_str(), "%s %d %d", &nome[0], &numero, &votos);
+            inserirCandidato(nome, numero);
+        }
+        arquivo.close();
+        cout << "Dados dos candidatos carregados com sucesso." << endl;
+    } else {
+        cout << "Nao foi possivel abrir o arquivo de candidatos." << endl;
+    }
+}
+
+void carregarEleitores() {
+    ifstream arquivo("eleitores.txt");
+    if (arquivo.is_open()) {
+        liberarEleitores();
+        string linha;
+        while (getline(arquivo, linha)) {
+            string nome;
+            int titulo;
+            sscanf(linha.c_str(), "%s %d", &nome[0], &titulo);
+            inserirEleitor(nome, titulo);
+        }
+        arquivo.close();
+        cout << "Dados dos eleitores carregados com sucesso." << endl;
+    } else {
+        cout << "Nao foi possivel abrir o arquivo de eleitores." << endl;
+    }
+}
 
 int main() {
-    setlocale(LC_ALL, "Portuguese");
+    int opcao;
+    bool sair = false;
 
-    Lista listaCandidatos;
-    Create_Lista(&listaCandidatos);
-    LoadListaFromFile(&listaCandidatos, "candidatos.txt");
+    while (!sair) {
+        cout << "-------- Festa da Democracia --------" << endl;
+        cout << "1 - Inserir candidato" << endl;
+        cout << "2 - Inserir eleitor" << endl;
+        cout << "3 - Listar candidatos" << endl;
+        cout << "4 - Listar eleitores" << endl;
+        cout << "5 - Salvar candidatos" << endl;
+        cout << "6 - Salvar eleitores" << endl;
+        cout << "7 - Carregar candidatos" << endl;
+        cout << "8 - Carregar eleitores" << endl;
+        cout << "9 - Sair" << endl;
+        cout << "-------------------------------------" << endl;
+        cout << "Escolha uma opcao: ";
+        cin >> opcao;
 
-    int menu;
-    while (menu != 4) {
-        cout << "*--------------------------------------------------*" << endl;
-        cout << "Menu de opções da festa da democracia: " << endl;
-        cout << "Escolha uma das opções abaixo: " << endl;
-        cout << "1 - Inserir novos candidatos na eleição;" << endl;
-        cout << "2 - Listar os candidatos inscritos na eleição;" << endl;
-        cout << "3 - Remover candidatos da eleição;" << endl;
-        cout << "4 - Sair." << endl;
-        cout << "*--------------------------------------------------*" << endl;
-        cout << "Digite o número da opção desejada: ";
-        cin >> menu;
-
-        switch (menu) {
+        switch (opcao) {
             case 1: {
-                Candidatos* cand = new Candidatos;
-
-                cout << endl;
-                cout << "Nome do candidato: ";
-                cin >> cand->nome;
-                cout << "Número do candidato: ";
-                cin >> cand->num_candidato;
-
-                Insert_Lista(&listaCandidatos, cand);
-
-                cout << "Candidato inserido com sucesso!" << endl;
+                string nome;
+                int numero;
+                cout << "Digite o nome do candidato: ";
+                cin >> nome;
+                cout << "Digite o numero do candidato: ";
+                cin >> numero;
+                inserirCandidato(nome, numero);
                 break;
             }
             case 2: {
-                cout << "Lista de candidatos inscritos na eleição: " << endl;
-                if (IsEmpty_Lista(&listaCandidatos)) {
-                    cout << "Não há candidatos na lista." << endl;
-                } else {
-                    Print_Lista(&listaCandidatos);
-                }
+                string nome;
+                int titulo;
+                cout << "Digite o nome do eleitor: ";
+                cin >> nome;
+                cout << "Digite o titulo do eleitor: ";
+                cin >> titulo;
+                inserirEleitor(nome, titulo);
                 break;
             }
-            case 3: {
-                if (IsEmpty_Lista(&listaCandidatos)) {
-                    cout << "Não há candidatos na lista." << endl;
-                } else {
-                    bool erro;
-                    Candidatos* removedCandidate = Remove_Lista(&listaCandidatos, &erro);
-                    cout << "Candidato removido: " << removedCandidate->nome << " (Número: " << removedCandidate->num_candidato << ")" << endl;
-                    delete removedCandidate;
-                }
+            case 3:
+                listarCandidatos();
                 break;
-            }
             case 4:
-                cout << "Encerrando o programa..." << endl;
+                listarEleitores();
+                break;
+            case 5:
+                salvarCandidatos();
+                break;
+            case 6:
+                salvarEleitores();
+                break;
+            case 7:
+                carregarCandidatos();
+                break;
+            case 8:
+                carregarEleitores();
+                break;
+			case 9:
+                sair = true;
                 break;
             default:
-                cout << "Opção inválida." << endl;
+                cout << "Opcao invalida. Digite novamente." << endl;
         }
+
+        cout << endl;
     }
 
-    SaveListaToFile(&listaCandidatos, "candidatos.txt");  // Grava a lista atualizada no arquivo
+    liberarCandidatos();
+    liberarEleitores();
 
     return 0;
 }
