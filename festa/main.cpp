@@ -2,7 +2,9 @@
 #include <fstream>
 #include <sstream>
 #include <cstdlib>
-
+//Projeto estrutura de dados - A festa da democracia
+//Larissa Volsi dos Santos
+//24/06/23
 using namespace std;
 
 struct Candidato {
@@ -97,11 +99,11 @@ void cadastrarEleitor() {
     }
 }
 void carregarCandidatos() {
-    ifstream arquivo("candidatos.txt");
+    ifstream arquivo("candidatos.txt"); 
     if (arquivo.is_open()) {
         string linha;
         while (getline(arquivo, linha)) {
-            stringstream ss(linha);
+            stringstream ss(linha); //permite que a linha seja processada como uma sequência de caracteres
             string nomeNumero;
             ss >> nomeNumero;
 
@@ -254,9 +256,6 @@ void inserirNaFila(int tituloEleitor) {
 }
 
 
-int totalVotosRegistrados = 0;
-int eleitoresFaltantes = 0;
-
 Candidato* buscarCandidato(const string& nome) {
     Candidato* atual = listaCandidatos;
     while (atual != NULL) {
@@ -280,25 +279,6 @@ Candidato* buscarCandidatoPorNumero(int numero) {
 }
 
 
-void salvarRelatorio() {
-    ofstream arquivoRelatorio("votos.txt");
-    if (arquivoRelatorio.is_open()) {
-        arquivoRelatorio << "Relatorio de votos por candidato:" << endl;
-
-        Candidato* atual = listaCandidatos;
-        while (atual != NULL) {
-            arquivoRelatorio << "Candidato: " << atual->nome << ", Votos: " << atual->votos << endl;
-            atual = atual->prox;
-        }
-
-        arquivoRelatorio << "Total de votos registrados: " << totalVotosRegistrados << endl;
-        arquivoRelatorio << "Eleitores faltantes: " << eleitoresFaltantes << endl;
-
-        arquivoRelatorio.close();
-    } else {
-        cout << "Nao foi possivel abrir o arquivo de relatorio." << endl;
-    }
-}
 
 bool verificarEleitorNaFila(int tituloEleitor) {
     Eleitor* atual = filaVotacao;
@@ -316,7 +296,7 @@ bool verificarEleitorNaFila(int tituloEleitor) {
 int main() {
     int opcao;
     do {
-        cout << "----- MENU -----" << endl;
+        cout << "----- Festa da democracia! -----" << endl;
         cout << "1 - Cadastrar candidatos" << endl;
         cout << "2 - Cadastrar eleitores" << endl;
         cout << "3 - Carregar candidatos" << endl;
