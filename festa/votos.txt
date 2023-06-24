@@ -1,0 +1,5 @@
+Candidato: Orlando, Votos: 1
+Candidato: Nilton, Votos: 0
+Candidato: Angela, Votos: 0
+Candidato: Jeane, Votos: 1
+Candidato: Leonardo, Votos: 0

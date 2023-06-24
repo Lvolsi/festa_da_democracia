@@ -1,0 +1,6 @@
+Pedro 0
+Renata 1
+Edson 50
+Larissa 4
+Igor 9
+Monica 8
